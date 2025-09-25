@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Retro Code Challenge - DOS</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+      background: #000;
+      color: #0f0;
+      display: flex;
+      height: 100vh;
+    }
+    .program, .editor {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .program {
+      border-right: 2px solid #0f0;
+      background: #000;
+    }
+    .editor {
+      background: #111;
+      display: flex;
+      flex-direction: column;
+    }
+    textarea {
+      flex: 1;
+      width: 100%;
+      background: #222;
+      color: #0f0;
+      border: none;
+      padding: 10px;
+      resize: none;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #0f0;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #9f9;
+    }
+    pre {
+      white-space: pre-wrap;
+    }
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #0f0;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- DOS-style program output -->
+  <div class="program">
+    <pre style="text-align: center; color: #0f0; font-size: 12px;">H   H    OOO     GGG     II   AAA 
+ H   H  O     O  G    G   II  A   A  
+HHHHH  O     O  G        II  AAAAA 
+H   H  O     O  G   GG   II  A   A 
+H   H    OOO     GGG G   II  A   A 
+ ----------------------------------
+     E   K   O   N   O   M   I
+    </pre>
+    <h3>Verifikationsuträkning</h3>
+    <table border="1" style="color: #0f0; background: #000; border-color: #0f0; width: 100%;">
+      <tr><th>Beskrivning</th><th>Debit</th><th>Kredit</th></tr>
+      <tr><td>Köp av varor</td><td>123.4588</td><td></td></tr>
+      <tr><td>Försäljning</td><td></td><td>67.89897</td></tr>
+      <tr><td>Ränta</td><td></td><td>55.56999</td></tr>
+      <tr><td>Summa</td><td>123.457797</td><td>123.45879</td></tr>
+    </table>
+  </div>
+
+  <!-- Developer editor -->
+  <div class="editor">
+    <h3>Utvecklarprogrammet (fixa koden)</h3>
+    <textarea id="code">
+10 PRINT "H   H    OOO     GGG     II   AAA" 
+20 PRINT "H   H  O     O  G    G   II  A   A"  
+30 PRINT "HHHHH  O     O  G        II  AAAAA"
+40 PRINT "H   H  O     O  G   GG   II  A   A"
+50 PRINT "H   H    OOO     GGG G   II  A   A" 
+60 PRINT "----------------------------------"
+70 PRINT "E   K   O   N   O   M   I"
+80 PRINT "Verifikationsuträkning"
+90 LET DEBIT = 123.4588
+100 LET KREDIT1 = 67.89897
+110 LET KREDIT2 = 55.56999
+120 LET SUM_DEBIT = DEBIT
+130 LET SUM_KREDIT = KREDIT1 + KREDIT2
+140 PRINT "Köpa av varor: "; DEBIT; " (Debit)"
+150 PRINT "Försäljning: "; KREDIT1; " (Kredit)"
+160 PRINT "Ränta: "; KREDIT2; " (Kredit)"
+170 PRINT "Summa Debit: "; SUM_DEBIT
+180 PRINT "Summa Kredit: "; SUM_KREDIT
+190 IF SUM_DEBIT <> SUM_KREDIT THEN PRINT "Fel: Decimalfel i balans!"
+
+200 // Ändra format till 2 decimaler
+210 float pris = 10.0 / 3.0;
+220 printf("Pris: %.2f", pris);
+    </textarea>
+    <button onclick="checkCode()">Kör programmet</button>
+  </div>
+
+  <script>
+    function checkCode() {
+      let code = document.getElementById("code").value;
+      if(code.includes("%.2f")) {
+        document.getElementById("output").innerText = "Pris: 3.33";
+      } else {
+        document.getElementById("output").innerText = "Felaktigt format!\nFörsök igen...";
+      }
+    }
+  </script>
+</body>
+</html>
