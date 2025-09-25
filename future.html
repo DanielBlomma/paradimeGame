@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Future Level - Payment Flow (Challenge)</title>
+<style>
+  body {
+    margin: 0;
+    background: #121212;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+    display: flex;
+    height: 100vh;
+  }
+  .program, .editor {
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .program {
+    border-right: 1px solid #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .editor {
+    display: flex;
+    flex-direction: column;
+  }
+  h3 { margin: 0 0 10px; }
+  .task {
+    background: #1e1e1e;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #bbb;
+  }
+  textarea {
+    flex: 1;
+    background: #1e1e1e;
+    color: #00ff9c;
+    border: none;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+  button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    background: #00bcd4;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover { background: #00acc1; }
+
+  /* Flowchart */
+  .flow {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 90%;
+    position: relative;
+  }
+  .node {
+    width: 170px;
+    height: 100px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: bold;
+    position: relative;
+    color: #fff;
+    padding: 5px;
+  }
+  .economy { background: #1565c0; line-height: 100px; }
+  .validator { background: #fbc02d; color: #000; line-height: 1.4em; }
+  .endpoint { background: #8e24aa; line-height: 100px; }
+  .bank { background: #2e7d32; line-height: 100px; }
+
+  /* Bubble */
+  .bubble {
+    width: 20px;
+    height: 20px;
+    background: #00ff9c;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: move 6s linear forwards;
+    display: none;
+  }
+  @keyframes move {
+    0% { left: 5%; }
+    25% { left: 30%; }
+    50% { left: 50%; }
+    75% { left: 70%; }
+    100% { left: 90%; }
+  }
+  .error { background: #ff5252 !important; }
+
+  /* Fuskruta */
+  .solution {
+    background: #1e1e1e;
+    border: 1px solid #444;
+    padding: 10px;
+    margin-top: 10px;
+    display: none;
+    font-size: 13px;
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+
+<!-- Left: Flow -->
+<div class="program">
+  <div class="flow">
+    <div class="node economy">Ekonomisystem</div>
+    <div class="node validator" id="validator">Validerings-AI<br><small>väntar...</small></div>
+    <div class="node endpoint">API / Endpoint</div>
+    <div class="node bank" id="bank">Bank-AI</div>
+    <div class="bubble" id="bubble"></div>
+  </div>
+</div>
+
+<!-- Right: Editor -->
+<div class="editor">
+  <h3>Utmaning</h3>
+  <div class="task">
+    📌 Skriv en prompt där du:<br>
+    • Förklarar att du vill skicka en betalning (inkludera JSON)<br>
+    • JSON måste innehålla <code>SenderIBAN</code>, <code>ReceiverIBAN</code>, <code>Amount</code> (två decimaler), <code>Currency</code>, <code>Reference</code><br>
+    • Betalningen ska skickas till <b>Bank A</b>, som kräver att <code>ReceiverIBAN</code> = <code>SE7280000810340009783244</code>
+  </div>
+  <textarea id="prompt">Jag vill skicka min betalning: { }</textarea>
+  <button onclick="sendPrompt()">Skicka prompt</button>
+  <button onclick="showSolution()">Visa lösning (fusk)</button>
+
+  <div class="solution" id="solutionBox">
+    ✅ Exempel på korrekt prompt:<br><br>
+    Jag vill skicka min betalning: {<br>
+    &nbsp;&nbsp;"SenderIBAN": "SE3550000000054910000003",<br>
+    &nbsp;&nbsp;"ReceiverIBAN": "SE7280000810340009783244",<br>
+    &nbsp;&nbsp;"Amount": "1095.00",<br>
+    &nbsp;&nbsp;"Currency": "SEK",<br>
+    &nbsp;&nbsp;"Reference": "Faktura 930421"<br>
+    } till validering och sedan till Bank A
+  </div>
+</div>
+
+<script>
+function sendPrompt() {
+  let text = document.getElementById("prompt").value;
+  let bubble = document.getElementById("bubble");
+  let validatorNode = document.getElementById("validator");
+  let bankNode = document.getElementById("bank");
+
+  bubble.style.display = "block";
+  bubble.classList.remove("error");
+  bubble.style.animation = "none";
+  validatorNode.innerHTML = "Validerings-AI<br><small>validerar...</small>";
+  bankNode.innerText = "Bank-AI";
+  void bubble.offsetWidth;
+  bubble.style.animation = "move 6s linear forwards";
+
+  setTimeout(() => {
+    let errors = [];
+    let jsonMatch = text.match(/{[\s\S]*}/);
+    let data = null;
+
+    if (!jsonMatch) {
+      errors.push("Ingen JSON hittades i prompten");
+    } else {
+      try {
+        data = JSON.parse(jsonMatch[0]);
+      } catch(e) {
+        errors.push("Ogiltigt JSON-format");
+      }
+    }
+
+    if (data) {
+      if (!/^SE\d{15,}$/.test(data.SenderIBAN)) errors.push("SenderIBAN ogiltigt");
+      if (data.ReceiverIBAN !== "SE7280000810340009783244") errors.push("ReceiverIBAN måste matcha Bank A");
+      if (!data.Amount) errors.push("Amount saknas");
+      if (data.Amount && !/^\d+\.\d{2}$/.test(data.Amount)) errors.push("Amount måste ha två decimaler");
+      if (!data.Currency || !["SEK","EUR","USD"].includes(data.Currency)) errors.push("Valuta ogiltig");
+      if (!data.Reference) errors.push("Reference saknas");
+    }
+
+    if (errors.length > 0) {
+      bubble.classList.add("error");
+      bubble.style.animation = "none";
+      bubble.style.left = "40%";
+      validatorNode.innerHTML = "Validerings-AI<br><small style='color:red'>" + errors.join("<br>") + "</small>";
+      bankNode.innerText = "Bank-AI ❌ (Ingen betalning)";
+    } else {
+      validatorNode.innerHTML = "Validerings-AI<br><small style='color:green'>OK</small>";
+      bankNode.innerText = "Bank-AI ✅ ACCEPTED";
+    }
+  }, 3000);
+}
+
+function showSolution() {
+  document.getElementById("solutionBox").style.display = "block";
+}
+</script>
+
+</body>
+</html>
