@@ -201,6 +201,9 @@ function sendPrompt() {
     } else {
       validatorNode.innerHTML = "Validerings-AI<br><small style='color:green'>OK</small>";
       bankNode.innerText = "Bank-AI ✅ ACCEPTED";
+      if (window.parent) {
+          window.parent.postMessage({ action: "nextLevel" }, "*");
+      }
     }
   }, 3000);
 }

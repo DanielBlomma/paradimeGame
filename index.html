@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Retro Coding Challenge</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Tahoma, sans-serif;
+    background: #121212;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  header {
+    background: #1e1e1e;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+  }
+  #progress {
+    background: #222;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+  }
+  iframe {
+    flex: 1;
+    border: none;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+  <header>💾 Retro Coding Challenge</header>
+  <div id="progress">Level 1 / 4</div>
+  <iframe id="gameFrame" src="dos.html"></iframe>
+
+  <script>
+    window.currentLevel = 1;
+    const levels = [
+      "dos.html",
+      "311.html",
+      "webera.html",
+      "future.html"
+    ];
+
+    window.addEventListener("message", (event) => {
+    if (event.data.action === "nextLevel") {
+        nextLevel();
+    }
+    });
+    // Funktion för att gå till nästa level
+    window.nextLevel = function() {
+      if (window.currentLevel < levels.length) {
+        window.currentLevel++;
+        document.getElementById("gameFrame").src = levels[window.currentLevel - 1];
+        document.getElementById("progress").innerText =
+          "Level " + window.currentLevel + " / " + levels.length;
+      } else {
+        document.getElementById("progress").innerText =
+          "🎉 Alla nivåer klara!";
+        document.getElementById("gameFrame").srcdoc =
+          "<h1 style='text-align:center; color:white; margin-top:50px;'>Grattis! Du har klarat spelet 🎉</h1>";
+      }
+    };
+  </script>
+</body>
+</html>

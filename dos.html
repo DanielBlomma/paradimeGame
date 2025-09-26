@@ -136,6 +136,9 @@ H   H    OOO     GGG G   II  A   A
     document.getElementById("credit").innerText = "67.90";
     document.getElementById("sumCredit").innerText = "55.57";  // Detta är för ränta (eftersom samma ID används för två celler)
     document.getElementById("sumDebit").innerText = "123.46";
+    if (window.parent) {
+      window.parent.postMessage({ action: "nextLevel" }, "*");
+    }
     // För kredit-summa (andra cellen med id="sumCredit"): Eftersom samma ID används, kanske ändra HTML först för att skilja på dem.
     // Alternativ: Gör kredit-summa till (67.90 + 55.57) = 123.47, men för balans, sätt till 123.46.
     // Här sätter jag kredit-summa till 123.46 för att balansera.

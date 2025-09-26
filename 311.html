@@ -288,7 +288,7 @@ Dim lastname As String
 Dim fullname As String
 name = "Daniel"
 lastname = "Nilsson"
-fullname = name & " " & lastname
+fullname = name & lastname
             </textarea>
             <button onclick="checkCode()">Kör programmet</button>
           </div>
@@ -314,6 +314,9 @@ fullname = name & " " & lastname
             // Simulera att fullname blir "Daniel Nilsson"
             document.getElementById("designName").innerText = "Daniel Nilsson";
             document.getElementById("customerName").innerText = "Daniel Nilsson";  // Uppdatera också fakturan om du vill
+            if (window.parent) {
+                window.parent.postMessage({ action: "nextLevel" }, "*");
+            }
         }
     }
   </script>

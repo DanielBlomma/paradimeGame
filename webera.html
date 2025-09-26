@@ -224,6 +224,9 @@ if (
       try {
         new Function(code)();
         document.getElementById("statusBar").innerHTML = "Done";
+        if (window.parent) {
+                window.parent.postMessage({ action: "nextLevel" }, "*");
+            }
       } catch (err) {
         document.getElementById("statusBar").innerHTML =
           "<span style='color:orange'>⚠ Error on page</span>";
