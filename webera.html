@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Retro Code Challenge - Web 1.0 (IE6)</title>
+  <title>Retro Code Challenge - IE6 Level</title>
   <style>
     body {
       margin: 0;
@@ -11,11 +11,13 @@
       display: flex;
       height: 100vh;
     }
+
     .program, .editor {
       flex: 1;
       padding: 10px;
       box-sizing: border-box;
     }
+
     .program {
       border-right: 2px solid #000;
       display: flex;
@@ -33,13 +35,22 @@
       flex-direction: column;
       box-shadow: 2px 2px #808080;
     }
+
     .ie6-title {
       background: linear-gradient(to right, #0055a5, #369);
       color: #fff;
       font-weight: bold;
       font-size: 14px;
       padding: 2px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+
+    .ie6-logo {
+      height: 20px;
+    }
+
     .ie6-toolbar {
       background: #e0e0e0;
       display: flex;
@@ -48,6 +59,7 @@
       padding: 3px;
       border-bottom: 1px solid #808080;
     }
+
     .ie6-toolbar button {
       background: #f0f0f0;
       border: 1px solid #808080;
@@ -55,33 +67,67 @@
       font-size: 12px;
       cursor: pointer;
     }
+
     .ie6-address {
       display: flex;
       align-items: center;
       padding: 2px;
       background: #dcdcdc;
       border-bottom: 1px solid #808080;
+      font-size: 12px;
     }
+
     .ie6-address input {
       flex: 1;
       border: 1px inset #808080;
       padding: 2px;
       font-size: 12px;
     }
+
     .ie6-content {
       flex: 1;
       padding: 10px;
       font-size: 14px;
       overflow: auto;
     }
+
     .ie6-status {
       background: #dcdcdc;
       font-size: 11px;
       padding: 2px 5px;
       border-top: 1px solid #808080;
+      cursor: pointer;
     }
 
-    /* --- Editor (FrontPage style) --- */
+    /* --- Script error popup --- */
+    #errorPopup {
+      display: none;
+      position: absolute;
+      top: 120px;
+      left: 120px;
+      width: 420px;
+      background: #fff;
+      border: 2px solid #000;
+      font-family: Tahoma, sans-serif;
+      font-size: 12px;
+      padding: 10px;
+      z-index: 999;
+      box-shadow: 4px 4px #444;
+    }
+
+    #errorPopup h4 {
+      margin: 0 0 5px;
+    }
+
+    #errorPopup button {
+      margin: 5px;
+      padding: 4px 12px;
+      border: 1px solid #444;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+
+    /* --- Editor --- */
     .editor-env {
       display: flex;
       flex-direction: column;
@@ -89,65 +135,22 @@
       border: 2px solid #000;
       background: #eaeaea;
     }
+
     .menubar {
       background: #d4d0c8;
       padding: 4px 8px;
       font-size: 12px;
       border-bottom: 1px solid #808080;
     }
-    .toolbar {
-      background: #f0f0f0;
-      padding: 4px;
-      display: flex;
-      gap: 5px;
-      border-bottom: 1px solid #808080;
-    }
-    .toolbar button {
-      width: 24px;
-      height: 24px;
-      background: #fff;
-      border: 1px solid #808080;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .tabs {
-      background: #d4d0c8;
-      padding: 3px;
-      border-bottom: 1px solid #808080;
-    }
-    .tabs button {
-      background: #c0c0c0;
-      border: 1px solid #808080;
-      margin-right: 2px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .tab-content {
-      flex: 1;
-      display: none;
-      padding: 10px;
-      overflow: auto;
-      background: #fff;
-      font-size: 13px;
-    }
-    .tab-content.active {
-      display: block;
-    }
+
     textarea {
+      flex: 1;
       width: 100%;
-      height: 100%;
       font-family: monospace;
       font-size: 13px;
       border: none;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 10px;
-    }
-    td, th {
-      border: 1px solid #000;
-      padding: 4px;
+      padding: 10px;
+      background: #fff;
     }
   </style>
 </head>
@@ -155,7 +158,10 @@
   <!-- IE6 fakad browser (left) -->
   <div class="program">
     <div class="ie6">
-      <div class="ie6-title">Invoice - Microsoft Internet Explorer</div>
+      <div class="ie6-title">
+        Invoice - Microsoft Internet Explorer
+        <img src="ie6.png" alt="IE6 Logo" class="ie6-logo">
+      </div>
       <div class="ie6-toolbar">
         <button>←</button>
         <button>→</button>
@@ -167,86 +173,86 @@
         Address: <input type="text" value="http://www.hogia.se/faktura.html">
       </div>
       <div class="ie6-content" id="webOutput">
-        <b>Laddar faktura...</b><br>
-        <i>Fel: Okänt JavaScript-problem</i>
+        <b>Laddar faktura...</b>
       </div>
-      <div class="ie6-status">Done</div>
+      <div class="ie6-status" id="statusBar" onclick="openPopup()">Done</div>
     </div>
   </div>
 
   <!-- Editor (right) -->
   <div class="editor">
     <div class="editor-env">
-      <div class="menubar">File  Edit  View  Insert  Format  Table  Tools  Help</div>
-      <div class="toolbar">
-        <button title="Save">💾</button>
-        <button title="Preview">🌐</button>
-        <button title="Cut">✂</button>
-        <button title="Copy">📄</button>
-        <button title="Paste">📋</button>
-      </div>
-      <div class="tabs">
-        <button onclick="showTab('design')">[Design]</button>
-        <button onclick="showTab('code')">[Code]</button>
-      </div>
+      <div class="menubar">File  Edit  View  Insert  Format  Tools  Help</div>
+      <textarea id="code">
+// ****************
+// Fixa buggen: Arrayerna måste ha samma längd!
+// ****************
 
-      <!-- DESIGN VIEW -->
-      <div id="designTab" class="tab-content active">
-        <h3>Faktura (Designvy)</h3>
-        <table>
-          <tr><th>Kund</th><td id="designName">DanielNilsson</td></tr>
-          <tr><th>Kostnadsbärare</th><td>Konto1, Konto2</td></tr>
-          <tr><th>Resultatenheter</th><td>AvdelningA, AvdelningB</td></tr>
-          <tr><th>Projekt</th><td>ProjektX, ProjektY</td></tr>
-        </table>
-      </div>
+let kostnadsbarare = ["1001", "2001", "3001"];
+let resultatenheter = ["RE33", "RE53"];
+let projekt = ["ProjektX", "ProjektY", "ProjektZ"];
 
-      <!-- CODE VIEW -->
-      <div id="codeTab" class="tab-content">
-        <textarea id="code">
-// Fixa buggen: det finns en array för mycket!
-let kostnadsbarare = ["Konto1", "Konto2"];
-let resultatenheter = ["AvdelningA", "AvdelningB"];
-let projekt = ["ProjektX", "ProjektY"];
-let extra = ["Felaktig array"]; // <- ska bort!
-
-document.getElementById("webOutput").innerHTML =
-  "<h3>Faktura</h3>" +
-  "<p>Kund: DanielNilsson</p>" +
-  "<p>Kostnadsbärare: " + kostnadsbarare.join(", ") + "</p>" +
-  "<p>Resultatenheter: " + resultatenheter.join(", ") + "</p>" +
-  "<p>Projekt: " + projekt.join(", ") + "</p>";
-        </textarea>
-        <button onclick="checkCode()">Kör sidan</button>
-      </div>
+if (
+  kostnadsbarare.length !== resultatenheter.length ||
+  kostnadsbarare.length !== projekt.length
+) {
+  throw new Error("Array mismatch");
+} else {
+  let faktura = "<h3>Faktura</h3>";
+  for (let i = 0; i < kostnadsbarare.length; i++) {
+    faktura += "<p>" + kostnadsbarare[i] + " - " + resultatenheter[i] + " - " + projekt[i] + "</p>";
+  }
+  document.getElementById("webOutput").innerHTML = faktura;
+}
+      </textarea>
+      <button onclick="runCode()">Kör sidan</button>
     </div>
   </div>
 
+  <!-- Script Error Popup -->
+  <div id="errorPopup">
+    <h4>Script Error</h4>
+    <p id="errText">An error has occurred in the script on this page.</p>
+    <p>Do you want to continue running scripts on this page?</p>
+    <button onclick="closePopup(true)">Yes</button>
+    <button onclick="closePopup(false)">No</button>
+  </div>
+
   <script>
-    function showTab(tab) {
-      document.getElementById("designTab").classList.remove("active");
-      document.getElementById("codeTab").classList.remove("active");
-      if (tab === "design") {
-        document.getElementById("designTab").classList.add("active");
-      } else {
-        document.getElementById("codeTab").classList.add("active");
+    function runCode() {
+      let code = document.getElementById("code").value;
+      try {
+        new Function(code)();
+        document.getElementById("statusBar").innerHTML = "Done";
+      } catch (err) {
+        document.getElementById("statusBar").innerHTML =
+          "<span style='color:orange'>⚠ Error on page</span>";
+        showScriptError(err.message, 12, 5, "http://www.hogia.se/faktura.html");
       }
     }
 
-    function checkCode() {
-      let code = document.getElementById("code").value;
-      if (!code.includes("extra")) {
+    function showScriptError(msg, line, char, url) {
+      let text =
+        "Line: " + line + "<br>" +
+        "Char: " + char + "<br>" +
+        "Error: " + msg + "<br>" +
+        "Code: 0<br>" +
+        "URL: " + url;
+      document.getElementById("errText").innerHTML = text;
+      document.getElementById("errorPopup").style.display = "block";
+    }
+
+    function openPopup() {
+      if (document.getElementById("statusBar").innerText.includes("Error")) {
+        document.getElementById("errorPopup").style.display = "block";
+      }
+    }
+
+    function closePopup(continueScripts) {
+      document.getElementById("errorPopup").style.display = "none";
+      if (!continueScripts) {
         document.getElementById("webOutput").innerHTML =
-          "<h3>Faktura</h3>" +
-          "<p>Kund: Daniel Nilsson</p>" +
-          "<p>Kostnadsbärare: Konto1, Konto2</p>" +
-          "<p>Resultatenheter: AvdelningA, AvdelningB</p>" +
-          "<p>Projekt: ProjektX, ProjektY</p>";
-        document.getElementById("designName").innerText = "Daniel Nilsson";
-      } else {
-        document.getElementById("webOutput").innerHTML =
-          "<b>Laddar faktura...</b><br><i>Fel: Okänt JavaScript-problem</i>";
-        document.getElementById("designName").innerText = "DanielNilsson";
+          "<b>Script execution stopped by user</b>";
       }
     }
   </script>
