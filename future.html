@@ -62,25 +62,43 @@
   /* Flowchart */
   .flow {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    width: 90%;
+    width: 95%;
     position: relative;
+    gap: 60px;
   }
   .node {
-    width: 170px;
-    height: 100px;
-    border-radius: 12px;
+    width: 200px;
+    min-height: 120px;
+    border-radius: 20px;
     text-align: center;
     font-weight: bold;
-    position: relative;
-    color: #fff;
-    padding: 5px;
+    padding: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
   }
-  .economy { background: #1565c0; line-height: 100px; }
-  .validator { background: #fbc02d; color: #000; line-height: 1.4em; }
-  .endpoint { background: #8e24aa; line-height: 100px; }
-  .bank { background: #2e7d32; line-height: 100px; }
+  .economy {
+    background: linear-gradient(135deg, #1e88e5, #42a5f5);
+    box-shadow: 0 0 15px #42a5f5aa;
+    line-height: 90px;
+  }
+  .validator {
+    background: linear-gradient(135deg, #fdd835, #fbc02d);
+    color: #000;
+    font-size: 13px;
+    box-shadow: 0 0 15px #fbc02daa;
+  }
+  .endpoint {
+    background: linear-gradient(135deg, #8e24aa, #ba68c8);
+    box-shadow: 0 0 15px #ba68c8aa;
+    line-height: 90px;
+  }
+  .bank {
+    background: linear-gradient(135deg, #2e7d32, #66bb6a);
+    box-shadow: 0 0 20px #66bb6aaa;
+    font-size: 16px;
+    padding-top: 20px;
+  }
 
   /* Bubble */
   .bubble {
@@ -91,17 +109,59 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    animation: move 6s linear forwards;
     display: none;
+    box-shadow: 0 0 10px #00ff9c;
+    transition: left 1.5s ease-in-out;
   }
-  @keyframes move {
-    0% { left: 5%; }
-    25% { left: 30%; }
-    50% { left: 50%; }
-    75% { left: 70%; }
-    100% { left: 90%; }
+  .error { background: #ff5252 !important; box-shadow: 0 0 10px #ff5252; }
+
+  /* Checklist */
+  .checklist {
+    text-align: left;
+    font-size: 12px;
+    margin-top: 5px;
   }
-  .error { background: #ff5252 !important; }
+  .checklist div {
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .checklist div.show {
+    opacity: 1;
+  }
+  .ok { color: green; }
+  .fail { color: red; }
+
+  /* Bank pulse */
+  .bank-accepted {
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 15px #66ff99; }
+    50% { box-shadow: 0 0 35px #66ff99; }
+    100% { box-shadow: 0 0 15px #66ff99; }
+  }
+
+  /* Data stream between API and Bank */
+  .stream {
+    position: absolute;
+    top: 55%;
+    left: 63%;
+    width: 20%;
+    height: 4px;
+    overflow: hidden;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #00ff9c;
+    border-radius: 50%;
+    position: absolute;
+    animation: flow 2s linear infinite;
+  }
+  @keyframes flow {
+    from { left: -10px; }
+    to { left: 100%; }
+  }
 
   /* Fuskruta */
   .solution {
@@ -121,10 +181,14 @@
 <div class="program">
   <div class="flow">
     <div class="node economy">Ekonomisystem</div>
-    <div class="node validator" id="validator">Validerings-AI<br><small>väntar...</small></div>
+    <div class="node validator" id="validator">
+      Validerings-AI<br><small>väntar...</small>
+      <div class="checklist" id="checklist"></div>
+    </div>
     <div class="node endpoint">API / Endpoint</div>
     <div class="node bank" id="bank">Bank-AI</div>
     <div class="bubble" id="bubble"></div>
+    <div class="stream" id="stream"></div>
   </div>
 </div>
 
@@ -157,55 +221,117 @@
 function sendPrompt() {
   let text = document.getElementById("prompt").value;
   let bubble = document.getElementById("bubble");
+  let checklist = document.getElementById("checklist");
   let validatorNode = document.getElementById("validator");
   let bankNode = document.getElementById("bank");
+  let stream = document.getElementById("stream");
 
+  // Reset
   bubble.style.display = "block";
-  bubble.classList.remove("error");
-  bubble.style.animation = "none";
-  validatorNode.innerHTML = "Validerings-AI<br><small>validerar...</small>";
+  bubble.style.left = "5%";
+  checklist.innerHTML = "";
+  validatorNode.querySelector("small").innerText = "validerar...";
   bankNode.innerText = "Bank-AI";
-  void bubble.offsetWidth;
-  bubble.style.animation = "move 6s linear forwards";
+  bankNode.classList.remove("bank-accepted");
+  stream.innerHTML = "";
 
+  // Step 1: Move to validator
   setTimeout(() => {
-    let errors = [];
-    let jsonMatch = text.match(/{[\s\S]*}/);
-    let data = null;
+    bubble.style.left = "35%";
 
-    if (!jsonMatch) {
-      errors.push("Ingen JSON hittades i prompten");
-    } else {
-      try {
-        data = JSON.parse(jsonMatch[0]);
-      } catch(e) {
-        errors.push("Ogiltigt JSON-format");
+    // Run validation
+    validateData(text, (ok) => {
+      if (ok) {
+        validatorNode.querySelector("small").innerText = "OK";
+
+        // Step 2: Move to API
+        setTimeout(() => {
+          bubble.style.left = "60%";
+
+          // Start stream
+          startDataStream(stream);
+
+          // Step 3: Move to Bank
+          setTimeout(() => {
+            bubble.style.left = "85%";
+            stream.innerHTML = "";
+            if (ok) {
+              bankNode.innerText = "Bank-AI ✅\nACCEPTED";
+              bankNode.classList.add("bank-accepted");
+
+              setTimeout(() => {
+                if (window.parent) {
+                  window.parent.postMessage({ action: "nextLevel" }, "*");
+                }
+              }, 2000);
+            }
+          }, 2500);
+
+        }, 1000);
+
+      } else {
+        validatorNode.querySelector("small").innerText = "fel i data";
+        bankNode.innerText = "Bank-AI ❌ (Ingen betalning)";
+        bubble.classList.add("error");
       }
-    }
+    });
 
-    if (data) {
-      if (!/^SE\d{15,}$/.test(data.SenderIBAN)) errors.push("SenderIBAN ogiltigt");
-      if (data.ReceiverIBAN !== "SE7280000810340009783244") errors.push("ReceiverIBAN måste matcha Bank A");
-      if (!data.Amount) errors.push("Amount saknas");
-      if (data.Amount && !/^\d+\.\d{2}$/.test(data.Amount)) errors.push("Amount måste ha två decimaler");
-      if (!data.Currency || !["SEK","EUR","USD"].includes(data.Currency)) errors.push("Valuta ogiltig");
-      if (!data.Reference) errors.push("Reference saknas");
-    }
+  }, 500);
+}
 
-    if (errors.length > 0) {
-      bubble.classList.add("error");
-      bubble.style.animation = "none";
-      bubble.style.left = "40%";
-      validatorNode.innerHTML = "Validerings-AI<br><small style='color:red'>" + errors.join("<br>") + "</small>";
-      bankNode.innerText = "Bank-AI ❌ (Ingen betalning)";
-    } else {
-      validatorNode.innerHTML = "Validerings-AI<br><small style='color:green'>OK</small>";
-      bankNode.innerText = "Bank-AI ✅ ACCEPTED";
-      if (window.parent) {
-          window.parent.postMessage({ action: "nextLevel" }, "*");
+function validateData(text, callback) {
+  let errors = [];
+  let jsonMatch = text.match(/{[\s\S]*}/);
+  let data = null;
+
+  if (!jsonMatch) {
+    errors.push("Ingen JSON hittades");
+  } else {
+    try {
+      data = JSON.parse(jsonMatch[0]);
+    } catch(e) {
+      errors.push("Ogiltigt JSON-format");
+    }
+  }
+
+  let checks = [];
+  if (data) {
+    checks.push({field:"SenderIBAN", ok:/^SE\d{15,}$/.test(data.SenderIBAN)});
+    checks.push({field:"ReceiverIBAN", ok:data.ReceiverIBAN==="SE7280000810340009783244"});
+    checks.push({field:"Amount", ok:/^\d+\.\d{2}$/.test(data.Amount||"")});
+    checks.push({field:"Currency", ok:["SEK","EUR","USD"].includes(data.Currency)});
+    checks.push({field:"Reference", ok:!!data.Reference});
+  }
+
+  let checklist = document.getElementById("checklist");
+  checks.forEach((c,i)=>{
+    setTimeout(()=>{
+      let div=document.createElement("div");
+      div.classList.add("show");
+      div.classList.add(c.ok?"ok":"fail");
+      div.innerText=(c.ok?"✅ ":"❌ ")+c.field;
+      checklist.appendChild(div);
+      if (i===checks.length-1) {
+        setTimeout(()=>callback(checks.every(c=>c.ok)),500);
       }
-    }
-  }, 3000);
+
+      
+    }, i*500);
+  });
+
+  if (checks.length===0) {
+    setTimeout(()=>callback(false),500);
+  }
+}
+
+function startDataStream(stream) {
+  for (let i=0;i<5;i++) {
+    let dot=document.createElement("div");
+    dot.className="dot";
+    dot.style.top="0px";
+    dot.style.animationDelay=(i*0.4)+"s";
+    stream.appendChild(dot);
+  }
 }
 
 function showSolution() {
