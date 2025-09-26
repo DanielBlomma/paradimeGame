@@ -207,6 +207,12 @@
       width: 200px;
     }
   </style>
+  <script>
+    let name= "DanielNilsson";
+    window.onload = function() {
+  document.getElementById("customerName").innerText = name;
+};
+  </script>
 </head>
 <body>
   <!-- Win 3.11 Faktura (vänster sida) -->
@@ -230,7 +236,7 @@
 FAKTURA NR: 930421
 Datum: 1993-04-21
 
-Kund: DanielNilsson
+Kund: <span id="customerName">name</span>
 
 ----------------------------------------
 Artikel: Windows 3.11 Licens
@@ -277,11 +283,12 @@ Belopp att betala: 1 095 kr
         <div id="codeTab" class="tab-content active">
           <div class="code-editor">
             <textarea id="code">
-Dim namn As String
-Dim efternamn As String
-namn = "Daniel"
-efternamn = "Nilsson"
-MsgBox(namn + efternamn)  ' Fel: saknar mellanslag
+Dim name As String
+Dim lastname As String
+Dim fullname As String
+name = "Daniel"
+lastname = "Nilsson"
+fullname = name & " " & lastname
             </textarea>
             <button onclick="checkCode()">Kör programmet</button>
           </div>
@@ -303,37 +310,11 @@ MsgBox(namn + efternamn)  ' Fel: saknar mellanslag
 
     function checkCode() {
       let code = document.getElementById("code").value;
-      if (code.includes('namn & " " & efternamn')) {
-        document.getElementById("output").innerText =
-`FAKTURA NR: 930421
-Datum: 1993-04-21
-
-Kund: Daniel Nilsson
-
-----------------------------------------
-Artikel: Windows 3.11 Licens
-Antal : 1
-Pris  : 1 095 kr
-----------------------------------------
-Belopp att betala: 1 095 kr`;
-        document.getElementById("designName").innerText = "Daniel Nilsson";
-      } else {
-        document.getElementById("output").innerText =
-`FAKTURA NR: 930421
-Datum: 1993-04-21
-
-Kund: DanielNilsson
-
-----------------------------------------
-Artikel: Windows 3.11 Licens
-Antal : 1
-Pris  : 1 095 kr
-----------------------------------------
-Belopp att betala: 1 095 kr
-
-(Fel i kod – saknar mellanslag)`;
-        document.getElementById("designName").innerText = "DanielNilsson";
-      }
+      if (code.includes('fullname = name & " " & lastname')) {
+            // Simulera att fullname blir "Daniel Nilsson"
+            document.getElementById("designName").innerText = "Daniel Nilsson";
+            document.getElementById("customerName").innerText = "Daniel Nilsson";  // Uppdatera också fakturan om du vill
+        }
     }
   </script>
 </body>
