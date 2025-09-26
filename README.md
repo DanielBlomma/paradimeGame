@@ -9,18 +9,24 @@ Ett roligt och utmanande spel där du får resa genom olika epoker av dators his
 - **Utmaning:** Fixa en BASIC/VB-kod som ska runda tal till 2 decimaler. Uppdatera tabellen så att debit och kredit balanserar.
 - **Språk:** Fake BASIC med VB-influenser.
 - **Mål:** Gör alla tal i verifikationsuträkningen till 2 decimaler genom att använda rätt `SUB FixPrice`.
+### DOS Level
+![DOS Level](screenshots/1.png)
 
 ### 2. Windows 3.11 Level (`311.html`)
 - **Tema:** Windows 3.11-fönster med VB IDE.
 - **Utmaning:** Fixa VB-kod så att `fullname` blir "Daniel Nilsson" med mellanslag.
 - **Språk:** Visual Basic (VB).
 - **Mål:** Ändra `fullname = name & lastname` till att inkludera ett mellanslag, så att fakturan uppdateras.
+### 3. Windows 3.11 Level
+![DOS Level](screenshots/2.png)
 
 ### 3. Web 1.0 Level (`webera.html`)
 - **Tema:** Internet Explorer 6 med scriptfel-popup.
 - **Utmaning:** Fixa JavaScript-kod där arrayerna har olika längd, vilket orsakar ett fel.
 - **Språk:** JavaScript.
 - **Mål:** Gör alla arrayer lika långa så att fakturan renderas utan fel.
+### 3. Web 1.0 Level
+![DOS Level](screenshots/3.png)
 
 ### 4. Future Level (`future.html`)
 - **Tema:** Modern AI-driven betalningsflöde.
